@@ -8,11 +8,10 @@ from pygame.locals import *
 
 
 DARK_MODE_COLOUR = (29, 29, 29)
+WHITE = (255, 255, 255)
 
-# draw "collapsed" icons
 
-
-class ModelDiagram():
+class ModelDiagram():   # bit of performance on the table
     def __init__(self, surface, topLeftX, topLeftY, width, height, weights, fill=False, nodeRadius=10) -> None:
         """Mode can be "outline" or "fill" """
         self.topLeftX = topLeftX
@@ -80,7 +79,7 @@ class ModelDiagram():
 
         return numNodes, yOffset
 
-    def drawNodes(self, colour=(255, 255, 255), fill=False):
+    def drawNodes(self, colour=WHITE, fill=False):
         for layer in self.coords:
             for node in layer:
                 # pg.draw.circle(self.surface, (255, 255, 255),
@@ -102,11 +101,9 @@ class ModelDiagram():
     def drawCoordRangeConnections(self, layerNum, nodeRange, targetNodeRange):
         for nodeIndex in nodeRange:
             for targetIndex in targetNodeRange:
-                # weight colour needs to be determined
                 pg.draw.aaline(self.surface, self.getWeightColour(self.getConnectionWeight(
                     layerNum, nodeIndex, targetIndex)), self.coords[layerNum][nodeIndex], self.coords[layerNum + 1][targetIndex])
 
-    # collapsed symbol
     def drawCollapsedLayerConnections(self, layerNum):
         numLayerNodes = len(self.coords[layerNum])
         numNodes = int((numLayerNodes - 1) / 2)
@@ -130,6 +127,24 @@ class ModelDiagram():
                 self.drawCollapsedLayerConnections(layerNum)
             else:
                 self.drawFullLayerConnections(layerNum)
+
+    def drawCollapsedIcons(self):
+        pointOffset = 4 * round(self.nodeRadius / 4)
+        for coord in self.collapsedIconCoords:
+            gfxdraw.aacircle(self.surface, coord[0], coord[1], round(
+                self.nodeRadius / 4), WHITE)
+            gfxdraw.filled_circle(self.surface, coord[0], coord[1], round(
+                self.nodeRadius / 4), WHITE)
+
+            gfxdraw.aacircle(self.surface, coord[0] + pointOffset, coord[1], round(
+                self.nodeRadius / 4), WHITE)
+            gfxdraw.filled_circle(self.surface, coord[0] + pointOffset, coord[1], round(
+                self.nodeRadius / 4), WHITE)
+
+            gfxdraw.aacircle(self.surface, coord[0] - pointOffset, coord[1], round(
+                self.nodeRadius / 4), WHITE)
+            gfxdraw.filled_circle(self.surface, coord[0] - pointOffset, coord[1], round(
+                self.nodeRadius / 4), WHITE)
 
     # (performance) only do this when weights got updated and store in seperate colour matrix(list?, array?)
     def getWeightColour(self, weight):
@@ -159,6 +174,7 @@ class ModelDiagram():
         self.drawConnections()
         self.drawNodes(DARK_MODE_COLOUR, True)
         self.drawNodes()
+        self.drawCollapsedIcons()
 
     def weights(self, weights):
         if len(weights) != len(self.weights):
