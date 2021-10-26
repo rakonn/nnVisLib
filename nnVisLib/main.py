@@ -1,6 +1,5 @@
 import numpy as np
 import sys
-import random
 
 import pygame as pg
 from pygame import error, gfxdraw
@@ -112,8 +111,6 @@ class ModelDiagram():   # bit of performance on the table
         self.drawCoordRangeConnections(layerNum, range(
             0, numNodes+1), range(len(self.coords[layerNum + 1])))
 
-        # insert collapsed symnol drawing HERE
-
         self.drawCoordRangeConnections(layerNum, range(
             numLayerNodes - numNodes - 1, numLayerNodes), range(len(self.coords[layerNum + 1])))
 
@@ -176,7 +173,7 @@ class ModelDiagram():   # bit of performance on the table
         self.drawNodes()
         self.drawCollapsedIcons()
 
-    def weights(self, weights):
+    def setWeights(self, weights):
         if len(weights) != len(self.weights):
             raise ValueError
         self.weights = weights
